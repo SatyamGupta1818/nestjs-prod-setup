@@ -11,6 +11,7 @@ import {
 import * as bcrypt from 'bcrypt';
 
 export enum UserRole {
+    SUPER_ADMIN = 'super-admin',
     ADMIN = 'admin',
     USER = 'user',
     MODERATOR = 'moderator',
@@ -50,6 +51,9 @@ export class User {
     @Column({ name: 'locked_until', type: 'timestamptz', nullable: true, default: null })
     lockedUntil: Date | null;
 
+    @Column({ type: 'varchar', nullable: true, select: false })
+    hashedRefreshToken: string | null;
+    
     @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
     createdAt: Date;
 

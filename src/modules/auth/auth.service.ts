@@ -25,7 +25,6 @@ const LOCK_DURATION_MINUTES = 15;
 export class AuthService {
   private readonly logger = new Logger(AuthService.name);
 
-  // ── Cache secrets on startup to avoid repeated config lookups ────────────
   private readonly accessSecret: string;
   private readonly refreshSecret: string;
   private readonly accessExpiresIn: string;
@@ -37,16 +36,13 @@ export class AuthService {
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
   ) {
-    // getOrThrow guarantees string — eliminates undefined at the type level
     this.accessSecret = this.configService.getOrThrow<string>('JWT_ACCESS_SECRET');
     this.refreshSecret = this.configService.getOrThrow<string>('JWT_REFRESH_SECRET');
 
-    // get<string>(..., defaultValue) always returns string — never undefined
     this.accessExpiresIn = this.configService.get<string>('JWT_ACCESS_EXPIRES_IN', '15m');
     this.refreshExpiresIn = this.configService.get<string>('JWT_REFRESH_EXPIRES_IN', '7d');
   }
 
-  // ─── Register ──────────────────────────────────────────────────────────────
 
   async register(registerDto: RegisterDto): Promise<LoginResponseDto> {
     const { email, password, firstName, lastName, roles } = registerDto;
@@ -73,7 +69,6 @@ export class AuthService {
     return { user: savedUser.toSafeObject() as any, tokens };
   }
 
-  // ─── Login ─────────────────────────────────────────────────────────────────
 
   async login(loginDto: LoginDto): Promise<LoginResponseDto> {
     const { email, password } = loginDto;
@@ -122,7 +117,6 @@ export class AuthService {
     return { user: user.toSafeObject() as any, tokens };
   }
 
-  // ─── Logout ────────────────────────────────────────────────────────────────
 
   async logout(userId: string): Promise<void> {
     const result = await this.userRepository.update(
@@ -137,7 +131,6 @@ export class AuthService {
     }
   }
 
-  // ─── Refresh Tokens ────────────────────────────────────────────────────────
 
   async refreshTokens(
     userId: string,
@@ -179,7 +172,6 @@ export class AuthService {
     return tokens;
   }
 
-  // ─── Get Profile ───────────────────────────────────────────────────────────
 
   async getProfile(userId: string): Promise<Partial<User>> {
     const user = await this.userRepository.findOne({ where: { id: userId } });
@@ -189,7 +181,6 @@ export class AuthService {
     return user.toSafeObject();
   }
 
-  // ─── Private Helpers ───────────────────────────────────────────────────────
 
   private async generateTokens(
     userId: string,
